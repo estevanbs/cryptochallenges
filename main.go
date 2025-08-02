@@ -1,1 +1,7 @@
-package cryptochallenges
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("Go!")
+}
