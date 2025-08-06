@@ -23,25 +23,17 @@ func byteScore(value byte) int {
 	return 0
 }
 
-// get score of []byte based on most repeated byte
 func getScore(value []byte) int {
-	bytesScore := make(map[byte]int)
+	bytesScore := 0
 
 	for i := 0; i < len(value); i++ {
-		bytesScore[value[i]] = bytesScore[value[i]] + byteScore(value[i])
+		bytesScore += byteScore(value[i])
 	}
 
-	var maxScore int
-	for _, score := range bytesScore {
-		if score > maxScore {
-			maxScore = score
-		}
-	}
-
-	return maxScore
+	return bytesScore
 }
 
-func fixStringXordedChar(value string) string {
+func fixStringXordedChar(value string) ValueScore {
 	decoded, e := hex.DecodeString(value)
 	if e != nil {
 		panic(e)
@@ -62,5 +54,5 @@ func fixStringXordedChar(value string) string {
 		}
 	}
 
-	return string(maxScore.value)
+	return maxScore
 }

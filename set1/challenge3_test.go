@@ -9,7 +9,7 @@ func TestFixStringXordedChar(t *testing.T) {
 
 	result := fixStringXordedChar(input)
 
-	if result != test {
-		t.Fatalf("Fixing from string %s failed. expected=%s, got=%s", input, test, result)
+	if string(result.value) != test {
+		t.Fatalf("Fixing from string %s failed. expected=%s, got=%s", input, test, result.value)
 	}
 }
