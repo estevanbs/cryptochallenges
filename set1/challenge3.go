@@ -42,7 +42,6 @@ func fixStringXordedChar(value string) ValueScore {
 	maxScore := ValueScore{value: []byte{0}, score: 0}
 	for i := byte(0); i < math.MaxUint8; i++ {
 		tmp := make([]byte, len(decoded))
-		copy(tmp, decoded)
 
 		for j := 0; j < len(decoded); j++ {
 			tmp[j] = decoded[j] ^ i
