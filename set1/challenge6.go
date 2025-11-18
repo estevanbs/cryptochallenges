@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -21,29 +20,41 @@ func hammingDistance(bytes1, bytes2 []byte) int {
 	return distance
 }
 
-func estimateKeySize(input []byte) float32 {
-	results := make([][]float32, 5)
-	for i := 0; i < 5; i++ {
-		results[i] = make([]float32, 30)
-		for keySize := 2; keySize <= 30; keySize++ {
+func estimateKeySize(input []byte) int {
+	const MIN_KEY_SIZE = 2
+	const BLOCKS_TO_CHECK = 4
+	// use this MAX_KEY_SIZE to calculate hamming distance of all blocks
+	MAX_KEY_SIZE := len(input)/2 - BLOCKS_TO_CHECK - 1
+
+	keySizeChecks := MAX_KEY_SIZE - MIN_KEY_SIZE
+
+	results := make([][]float64, BLOCKS_TO_CHECK)
+	for i := 0; i < BLOCKS_TO_CHECK; i++ {
+		results[i] = make([]float64, keySizeChecks)
+		for keySize := MIN_KEY_SIZE; keySize < MAX_KEY_SIZE; keySize++ {
 			firstBytes := input[i : keySize+i]
 			secondBytes := input[keySize+i : (keySize+i)*2]
 
 			hd := hammingDistance(firstBytes, secondBytes)
-			nhd := float32(hd) / float32(keySize)
+			nhd := float64(hd) / float64(keySize)
 
-			results[i][keySize-2] = nhd
+			results[i][keySize-MIN_KEY_SIZE] = nhd
 		}
 	}
-	averages := make([]float32, 30)
-	for i := 0; i < 30; i++ {
-		for j := 0; j < 5; j++ {
-			averages[i] += results[j][i]
+	smallestAverage := math.MaxFloat64
+	probableKeySize := 0
+	for i := 0; i < keySizeChecks; i++ {
+		var resultsSum float64 = 0
+		for j := 0; j < BLOCKS_TO_CHECK; j++ {
+			resultsSum += results[j][i]
 		}
-		averages[i] = averages[i] / 5
+		average := resultsSum / BLOCKS_TO_CHECK
+		if average < smallestAverage {
+			smallestAverage = average
+			probableKeySize = i + MIN_KEY_SIZE
+		}
 	}
-	fmt.Println(averages)
-	return 0
+	return probableKeySize
 }
 
 func breakRepeatingKeyXor(input []byte) string {
